@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Fody;
+using RemoveReference2.Fody;
 
 namespace RemoveReference.Fody.Tests;
 

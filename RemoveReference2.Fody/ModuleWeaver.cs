@@ -2,7 +2,7 @@
 using System.Linq;
 using Fody;
 
-namespace RemoveReference.Fody
+namespace RemoveReference2.Fody
 {
     public class ModuleWeaver : BaseModuleWeaver
     {
@@ -38,15 +38,15 @@ namespace RemoveReference.Fody
 
         private void RemoveReference()
         {
-            var referenceToRemove = ModuleDefinition.AssemblyReferences.FirstOrDefault(x => x.Name == "RemoveReference");
+            var referenceToRemove = ModuleDefinition.AssemblyReferences.FirstOrDefault(x => x.Name == "RemoveReference2");
             if (referenceToRemove == null)
             {
-                WriteInfo("\tNo reference to 'RemoveReference' found. References not modified.");
+                WriteInfo("\tNo reference to 'RemoveReference2' found. References not modified.");
                 return;
             }
 
             ModuleDefinition.AssemblyReferences.Remove(referenceToRemove);
-            WriteInfo("\tRemoved reference to 'RemoveReference'.");
+            WriteInfo("\tRemoved reference to 'RemoveReference2'.");
         }
     }
 }

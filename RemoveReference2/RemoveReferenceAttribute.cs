@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RemoveReference
+namespace RemoveReference2
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class RemoveReferenceAttribute : Attribute
