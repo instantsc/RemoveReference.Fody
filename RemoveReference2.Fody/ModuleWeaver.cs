@@ -1,12 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Fody;
+using Mono.Cecil;
 
 namespace RemoveReference2.Fody
 {
     public class ModuleWeaver : BaseModuleWeaver
     {
         public override void Execute()
+        {
+            RunRemoveReference();
+            RunAddReference();
+            RemoveReference();
+        }
+
+        private void RunRemoveReference()
         {
             var attributesToRemove = ModuleDefinition.Assembly.CustomAttributes
                .Where(customAttribute => customAttribute.AttributeType.Name == "RemoveReferenceAttribute")
@@ -22,13 +31,33 @@ namespace RemoveReference2.Fody
                .Where(x => namesToRemove.Contains(x.FullName))
                .Distinct()
                .ToList();
+
             foreach (var assemblyNameReference in referencesToRemove)
             {
-                WriteInfo(assemblyNameReference.ToString());
+                WriteInfo($"Removing reference to {assemblyNameReference}");
                 ModuleDefinition.AssemblyReferences.Remove(assemblyNameReference);
             }
+        }
 
-            RemoveReference();
+        private void RunAddReference()
+        {
+            var attributesToRemove = ModuleDefinition.Assembly.CustomAttributes
+               .Where(customAttribute => customAttribute.AttributeType.Name == "AddReferenceAttribute")
+               .ToList();
+            var namesToAdd = new HashSet<(string, Version)>(attributesToRemove.Select(x =>
+                ((string)x.ConstructorArguments[0].Value, Version.Parse((string)x.ConstructorArguments[1].Value))));
+
+            foreach (var customAttribute in attributesToRemove)
+            {
+                ModuleDefinition.Assembly.CustomAttributes.Remove(customAttribute);
+            }
+
+            foreach (var (name, version) in namesToAdd)
+            {
+                var newReference = new AssemblyNameReference(name, version);
+                WriteInfo($"Adding reference to {newReference}");
+                ModuleDefinition.AssemblyReferences.Add(newReference);
+            }
         }
 
         public override IEnumerable<string> GetAssembliesForScanning()
